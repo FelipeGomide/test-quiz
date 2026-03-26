@@ -57,6 +57,7 @@ def test_create_choice_with_invalid_text():
     with pytest.raises(Exception):
         choice_a = question.add_choice("a" * 101)
 
+
 def test_question_default_values():
     question = Question("q1")
 
@@ -128,3 +129,31 @@ def test_set_invalid_choice():
 
     with pytest.raises(Exception):
         question.set_correct_choices([choice_a.id + 1])
+
+
+@pytest.fixture
+def complete_question():
+    question = Question(title="q1")
+    choice_a = question.add_choice("a")
+    choice_b = question.add_choice("b")
+    choice_c = question.add_choice("c")
+    choice_d = question.add_choice("d")
+
+    return question
+
+
+def test_select_true_choice(complete_question):
+    question = complete_question
+
+    correct_choice = question.choices[0]
+    question.set_correct_choices([correct_choice.id])
+
+    correction = question.correct_selected_choices([correct_choice.id])
+    assert len(correction) == 1
+    assert correction[0] == True
+
+
+def test_select_too_many_choices(complete_question):
+
+    with pytest.raises(Exception):
+        complete_question.correct_selected_choices([0, 0])
